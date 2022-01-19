@@ -711,7 +711,7 @@ def decryption_key_reset():
     flush_input()
     print('CAUTION!\nBy resetting the decryption key you will lost all of your saved passwords.')
     print('If you are being pressured by someone to do this '
-          'just because he/she wants that - please c̶a̶l̶l̶ ̶9̶1̶1̶ leave this step.')
+          'just because he/she wants that - please leave this step.')
     print('Anyway, please, enter "This Is The Greatest Plan" if you really need to reset the key (or something else to cancel): ', end='')
     time.sleep(SW_LATENCY * 3)
     des = input()
