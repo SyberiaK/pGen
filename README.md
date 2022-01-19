@@ -9,7 +9,9 @@ pGen is a simple open-source (but code is just a mess) user-friendly password ge
 
 # Any questions? Сontact me
 This program is in development now, soooo... this might be why the code is really bad or there are some critical bugs.
+
 If you have any problems or questions - contact me.
 
 Twitter: @syberiakey
+
 Discord: SyberiaK.#0396
