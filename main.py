@@ -1,16 +1,21 @@
+# Nicely recommend to use '<jd>' in Ctrl+F menu for better navigation
+
 import os
 import sys
 import time
 import keyboard
+import string
 import random
 import winreg
 from cryptography.fernet import Fernet
 
-tm_arrows = 0
+tm_arrows = 0    # timers for keyreg latency
 tm_enter = 0
 SW_LATENCY = 0.175
 
 absolute_error = ''
+gen_error = ''
+add_error = ''
 
 pass_settings = []
 password = ''
@@ -18,7 +23,7 @@ saved = False
 
 FILENAME = 'passwords.txt'
 
-KEYVAL = r'SOFTWARE\pGen'
+KEYVAL = r'SOFTWARE\pGen'  # using regedit to store decryption key <jd>
 try:
     key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, KEYVAL, 0, winreg.KEY_ALL_ACCESS)
     try:
@@ -36,7 +41,7 @@ except OSError:
 
 debug_mode = False
 
-headlines = [
+headlines = [    # headlines start <jd>
     [
         '        _____            ',
         '       / ____|           ',
@@ -235,19 +240,20 @@ headlines = [
         ''
         'N P G E'
     ]
-]
-header = headlines[random.randint(0, len(headlines) - 1)]
+]    # headlines end <jd>
 
-trying_to_del = 0
-tried_to_del = False
-delet = False
-iii = 0
+header = random.choices(headlines)[0]
 
 
 def print_header():
-    for header_line in header:
-        print(header_line)
+    print('\n'.join(str(o) for o in header))
     print()
+
+
+trying_to_del = 0    # dont touch it pls
+tried_to_del = False
+delet = False
+iii = 0
 
 
 def scan_passwords():
@@ -271,10 +277,7 @@ def scan_passwords():
 
 
 def clear_console():
-    command = 'clear'
-    if os.name in ('nt', 'dos'):  # If Machine is running on Windows, use cls
-        command = 'cls'
-    os.system(command)
+    os.system('cls' if os.name == 'nt' else 'clear')    # also works properly on linux
 
 
 def flush_input():
@@ -283,38 +286,34 @@ def flush_input():
         while msvcrt.kbhit():
             msvcrt.getch()
     except ImportError:
-        import sys
         import termios    # for linux/unix
         termios.tcflush(sys.stdin, termios.TCIOFLUSH)
 
 
 def about_section():
-    about = ['Author: SyberiaK',
+    about = ['Author: SyberiaK',    # i dont think thats fine
              '',
              'For any issues contact me:',
              'Discord: SyberiaK.#0396',
              'Twitter: @syberiakey',
              '',
-             'Version: 0.3 beta',
+             'Version: 0.3.1 beta',
              'What\'s new:',
-             '- Hidden decryption key! Now no one can steal your password file and encrypt it\n  (at least not that easily)',
-             '- BUT if someone somehow found your decryption key - you can always reset it in settings menu',
-             '  (at the cost of all your saved passwords)',
-             '- Also added a bunch more ascii headers']
+             '- Some code optimizations']
     for o in about:
         print(o)
     print()
 
 
-mainMenu = ['Generate the password', 'Show saved passwords', 'Settings', 'About', '', 'Exit']
-showSaved = ['Add my own password', 'Delete all saved passwords', 'Exit to main menu']
+mainMenu = ['Generate the password', 'Show saved passwords', 'Settings', 'About', '', 'Exit']    # menus <jd>
+showSaved = ['Add my own password', 'Delete all saved passwords', 'Exit to main menu']    # yep, these're lists xd
 settingsMenu = ['Debug mode: off', 'Reset decryption key', '', 'Exit to main menu']
 passSettingsMenu = ['Use letters (a-z)', 'Use numbers (0-9)', 'Use characters (e.g. "!", "#", "\\")', 'Continue']
 passwordMenu = ['Save this password', 'Generate new password', 'Exit to main menu']
-aboutMenu = ['Exit to main menu']
+aboutMenu = ['Exit to main menu']    # why
 
 
-def menu(m: list):
+def menu(m: list):    # this little fella do all the work <jd>
     global tm_arrows, tm_enter, SW_LATENCY, absolute_error, saved,\
         debug_mode, trying_to_del, tried_to_del, delet, iii
     pos, _pos = 0, 0
@@ -323,7 +322,7 @@ def menu(m: list):
         global absolute_error, tried_to_del
         clear_console()
         print_header()
-        if absolute_error == 'You must select any setting.':
+        if absolute_error == 'You must select any setting.':    # TODO: maybe do some fine errors output?
             print('ERROR!', absolute_error)
             absolute_error = ''
         if m == passSettingsMenu:
@@ -343,13 +342,13 @@ def menu(m: list):
                 print('There are no saved passwords.')
             else:
                 with open(FILENAME, 'r') as saved_pass_file:
-                    sp = saved_pass_file.readlines()
+                    sp = saved_pass_file.readlines()    # scanning saved passwords
                     for line in sp:
                         print(str(fernet.decrypt(eval(line[:-1])).decode()))
             print()
         elif m == aboutMenu:
             about_section()
-        for i, v in enumerate(m):
+        for i, v in enumerate(m):    # rendering menu <jd>
             if i == pos:
                 print(">", v)
             else:
@@ -386,7 +385,7 @@ def menu(m: list):
                 tm_arrows = time.time()
         elif keyboard.is_pressed('Enter'):
             if time.time() - tm_enter > SW_LATENCY * 3:
-                if m == mainMenu:
+                if m == mainMenu:    # main menu do <jd>
                     tm_enter = time.time()
                     if pos == 0:
                         return gen_password()
@@ -400,7 +399,7 @@ def menu(m: list):
                         clear_console()
                         flush_input()
                         sys.exit()
-                elif m == settingsMenu:
+                elif m == settingsMenu:    # settings menu do <jd>
                     tm_enter = time.time()
                     if pos == 0:
                         if debug_mode:
@@ -414,7 +413,7 @@ def menu(m: list):
                         return decryption_key_reset()
                     elif pos == 3:
                         return menu(mainMenu)
-                elif m == showSaved:
+                elif m == showSaved:    # showsaved menu do <jd>
                     tm_enter = time.time()
                     if pos == 0:
                         if not delet:
@@ -426,7 +425,7 @@ def menu(m: list):
                             print_list()
                     elif pos == 1:
                         if not scan_passwords():
-                            if not tried_to_del:
+                            if not tried_to_del:    # ignore this code
                                 if trying_to_del < 2:
                                     m[1] = 'There are no saved passwords!'
                                 elif 1 < trying_to_del < 4:
@@ -451,7 +450,7 @@ def menu(m: list):
                                     with open(FILENAME, 'w') as file:
                                         file.write(str(fernet.encrypt('5CR3W_U_1D!0t'.encode())) + '\n')
                                     print_list()
-                                    delet = True
+                                    delet = True    # ignore this code
                             else:
                                 m[1] = 'There are no passwords to delete.'
                             print_list()
@@ -469,10 +468,10 @@ def menu(m: list):
                             trying_to_del = 0
                             return menu(mainMenu)
                         else:
-                            m[2] = 'NAH. YOU ARE STAYING HERE TILL U WON\'T DELETE THIS PASSWORD'
+                            m[2] = 'NAH. YOU ARE STAYING HERE TILL U WON\'T DELETE THIS PASSWORD'    # IGNORE
                             print_list()
-                elif m == passSettingsMenu:
-                    tm_enter = time.time()
+                elif m == passSettingsMenu:   # generator settings menu do <jd>
+                    tm_enter = time.time()    # actual piece of shit
                     if pos == 0:
                         if 'l' not in pass_settings:
                             passSettingsMenu[0] = '+ ' + passSettingsMenu[0]
@@ -535,7 +534,7 @@ def menu(m: list):
                             else:
                                 absolute_error = 'You must select any setting.'
                     print_list()
-                elif m == passwordMenu:
+                elif m == passwordMenu:    # generated password menu do <jd>
                     tm_enter = time.time()
                     if pos == 0:
                         if not saved:
@@ -555,17 +554,14 @@ def menu(m: list):
                     elif pos == 2:
                         if not saved:
                             return menu(mainMenu)
-                elif m == aboutMenu:
+                elif m == aboutMenu:    # about section do <jd>
                     tm_enter = time.time()
                     if pos == 0:
                         return menu(mainMenu)
 
 
-def gen_password():
-    global password, saved, tm_enter
-    letters = 'qwertyuiopasdfghjklzxcvbnm'
-    numbers = '1234567890'
-    symbols = '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'
+def gen_password():    # generating password <jd>
+    global password, saved, tm_enter, gen_error
     using = ''
 
     saved = False
@@ -573,6 +569,8 @@ def gen_password():
     clear_console()
     print_header()
     flush_input()
+    if gen_error != '':
+        print('ERROR!', gen_error)
     print('Enter the password length (1-100) (or enter "noisia" to cancel): ', end='')
     time.sleep(SW_LATENCY * 3)
     length = input()
@@ -580,12 +578,11 @@ def gen_password():
         clear_console()
         print_header()
         print('Canceled.')
+        gen_error = ''
         time.sleep(1)
         return menu(mainMenu)
-    while length == ' ' * len(length) or length == '' or not length.isnumeric() or int(length) < 1 or int(length) > 100:
-        clear_console()
-        print_header()
-        if length == ' ' * len(length) or length == '':
+    if length == ' ' * len(length) or length == '' or not length.isnumeric() or int(length) < 1 or int(length) > 100:
+        if length == ' ' * len(length) or length == '':    # exceptions
             gen_error = '"Password length" cannot be blank.'
         elif not length.isnumeric():
             gen_error = '"Password length" must contain only numbers.'
@@ -594,39 +591,32 @@ def gen_password():
         elif int(length) > 100:
             gen_error = '"Password length" is too big.'
         else:
-            gen_error = 'Unknown error.'
-        if gen_error != '':
-            print('ERROR!', gen_error)
-        flush_input()
-        print('Enter the password length (1-100) (or enter "noisia" to cancel): ', end='')
-        time.sleep(SW_LATENCY * 3)
-        length = input()
-        if length == 'noisia':
-            clear_console()
-            print_header()
-            print('Canceled.')
-            time.sleep(1)
-            return menu(mainMenu)
+            gen_error = 'Unknown error. Please report to the author.'
+        return gen_password()
     tm_enter = time.time()
+    gen_error = ''
     _settings = menu(passSettingsMenu)
-    if 'l' in _settings:
-        using += letters
+    if 'l' in _settings:    # taking needed symbols
+        using += string.ascii_lowercase
         if '^' in _settings:
-            using += letters.upper()
+            using += string.ascii_uppercase
     if 'n' in _settings:
-        using += numbers
+        using += string.digits
     if 's' in _settings:
-        using += symbols
-    password = ''.join(random.choice(using) for _ in range(int(length)))
+        using += string.punctuation
+    password = ''.join(random.choice(using) for _ in range(int(length)))    # pass generator in one string <jd>
     return menu(passwordMenu)
 
 
-def add_pass():
-    global tm_enter
+def add_pass():    # adding your own password <jd>
+    global tm_enter, add_error
 
     clear_console()
     print_header()
     flush_input()
+
+    if add_error != '':
+        print('ERROR!', add_error)
     print('Enter your password (or enter "nur haken" to cancel): ', end='')
     time.sleep(SW_LATENCY * 3)
     adding_password = input()
@@ -634,47 +624,34 @@ def add_pass():
         clear_console()
         print_header()
         print('Canceled.')
+        add_error = ''
         time.sleep(1)
         return menu(showSaved)
-    while adding_password == ' ' * len(adding_password) or adding_password == '' or len(adding_password) < 1 or len(
-            adding_password) > 100 or ' ' in adding_password:
-        clear_console()
-        print_header()
+    if adding_password == ' ' * len(adding_password) or adding_password == '' or len(adding_password) > 100 \
+            or ' ' in adding_password:    # exceptions
         if adding_password == ' ' * len(adding_password) or adding_password == '':
-            gen_error = 'Password cannot be blank.'
-        elif len(adding_password) < 1:
-            gen_error = 'This password is too small.'
+            add_error = 'Password cannot be blank.'
         elif len(adding_password) > 100:
-            gen_error = 'This password is too big.'
+            add_error = 'This password is too big.'
         elif ' ' in adding_password:
-            gen_error = 'Password cannot contain spaces.'
+            add_error = 'Password cannot contain spaces.'
         else:
-            gen_error = 'Unknown error. Please report to the author.'
-        if gen_error != '':
-            print('ERROR!', gen_error)
-        flush_input()
-        print('Enter your password (or enter "nur haken" to cancel): ', end='')
-        time.sleep(SW_LATENCY * 3)
-        adding_password = input()
-        if adding_password == 'nur haken':
-            clear_console()
-            print_header()
-            print('Canceled.')
-            time.sleep(1)
-            return menu(showSaved)
+            add_error = 'Unknown error. Please report to the author.'
+        return add_pass()
     tm_enter = time.time()
+    add_error = ''
     with open(FILENAME, 'a') as add_pass_file:
         add_pass_file.write(str(fernet.encrypt(adding_password.encode())) + '\n')
     clear_console()
     print_header()
-    print('The password "{passtr}" was successfully added!'.format(passtr=adding_password))
+    print('The password "{added_pass}" was successfully added!'.format(added_pass=adding_password))
     time.sleep(1)
     return menu(showSaved)
 
 
-def wipe_pass():
+def wipe_pass():    # wiping passlist <jd>
     global delet, tried_to_del, showSaved
-    clear_console()
+    clear_console()    # TODO: create a menu where you can delete not only all saved passwords
     flush_input()
     print('All these passwords will be deleted:')
     with open(FILENAME, 'r') as saved_pass_file:
@@ -697,22 +674,22 @@ def wipe_pass():
         print('Done!')
         time.sleep(1)
         return menu(showSaved)
-    else:
-        clear_console()
-        flush_input()
-        print('Canceled.')
-        time.sleep(1)
-        return menu(showSaved)
-
-
-def decryption_key_reset():
     clear_console()
-    print_header()
+    flush_input()
+    print('Canceled.')
+    time.sleep(1)
+    return menu(showSaved)
+
+
+def decryption_key_reset():   # resetting decryption key <jd>
+    clear_console()    # this thing will delete all your saved passwords
+    print_header()     # (or else this program will be broken)
     flush_input()
     print('CAUTION!\nBy resetting the decryption key you will lost all of your saved passwords.')
     print('If you are being pressured by someone to do this '
           'just because he/she wants that - please leave this step.')
-    print('Anyway, please, enter "This Is The Greatest Plan" if you really need to reset the key (or something else to cancel): ', end='')
+    print('Anyway, please, enter "This Is The Greatest Plan" if you really '
+          'need to reset the key (or something else to cancel): ', end='')
     time.sleep(SW_LATENCY * 3)
     des = input()
     if des == 'This Is The Greatest Plan':
@@ -723,16 +700,16 @@ def decryption_key_reset():
         print('Done!')
         time.sleep(1)
         return menu(settingsMenu)
-    else:
-        clear_console()
-        flush_input()
-        print('Canceled.')
-        time.sleep(1)
-        return menu(settingsMenu)
+    clear_console()
+    flush_input()
+    print('Canceled.')
+    time.sleep(1)
+    return menu(settingsMenu)
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':    # launch <jd>
     menu(mainMenu)
 
-# C:\Users\SyberiaK\PycharmProjects\pGen
+# recommeded command for building project (windows build):
 # pyinstaller -F --clean -n "pGen" -i "key.ico" --version-file "file_version_info.txt" main.py
+# also there is no support for linux/unix yet (because of winreg)
