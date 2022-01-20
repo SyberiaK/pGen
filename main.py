@@ -313,7 +313,7 @@ passwordMenu = ['Save this password', 'Generate new password', 'Exit to main men
 aboutMenu = ['Exit to main menu']    # why
 
 
-def menu(m: list):    # this little fella do all the work <jd>
+def menu(m: list):    # this little fella do all the hard work <jd>
     global tm_arrows, tm_enter, SW_LATENCY, absolute_error, saved,\
         debug_mode, trying_to_del, tried_to_del, delet, iii
     pos, _pos = 0, 0
