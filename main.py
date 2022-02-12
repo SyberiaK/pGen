@@ -236,12 +236,12 @@ headlines = [    # headlines start <jd>
         '****         ************ ************ ****    ****'
     ],
     [
-        'P G E N'
-        ''
-        'G E N P'
-        ''
-        'E N P G'
-        ''
+        'P G E N',
+        '',
+        'G E N P',
+        '',
+        'E N P G',
+        '',
         'N P G E'
     ]
 ]    # headlines end <jd>
@@ -303,7 +303,8 @@ def about_section():
              '',
              'Version: 0.4.0 beta',
              'What\'s new:',
-             '- Fixed an issue when pGen takes inputs while being non-focused']
+             '- Fixed an issue when pGen takes inputs while being non-focused',
+             '- Also fixed a header']
     for o in about:
         print(o)
     print()
