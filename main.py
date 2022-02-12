@@ -9,9 +9,13 @@ import random
 import winreg
 from cryptography.fernet import Fernet
 
+from win32gui import GetWindowText, GetForegroundWindow
+
 tm_arrows = 0    # timers for keyreg latency
 tm_enter = 0
 SW_LATENCY = 0.175
+
+window_name = GetWindowText(GetForegroundWindow())  # setting up window name for focus checking
 
 absolute_error = ''
 gen_error = ''
@@ -297,9 +301,9 @@ def about_section():
              'Discord: SyberiaK.#0396',
              'Twitter: @syberiakey',
              '',
-             'Version: 0.3.1 beta',
+             'Version: 0.4.0 beta',
              'What\'s new:',
-             '- Some code optimizations']
+             '- Fixed an issue when pGen takes inputs while being non-focused']
     for o in about:
         print(o)
     print()
@@ -365,199 +369,202 @@ def menu(m: list):    # this little fella do all the hard work <jd>
     print_list()
 
     while True:
-        if pos != _pos:
-            print_list()
-            _pos = pos
+        current_window = (GetWindowText(GetForegroundWindow()))
 
-        if keyboard.is_pressed('Up'):
-            if time.time() - tm_arrows > SW_LATENCY:
-                if pos > 0:
-                    pos -= 1
-                    if m[pos] == '':
+        if current_window == window_name:
+            if pos != _pos:
+                print_list()
+                _pos = pos
+
+            if keyboard.is_pressed('Up'):
+                if time.time() - tm_arrows > SW_LATENCY:
+                    if pos > 0:
                         pos -= 1
-                tm_arrows = time.time()
-        elif keyboard.is_pressed('Down'):
-            if time.time() - tm_arrows > SW_LATENCY:
-                if pos < len(m) - 1:
-                    pos += 1
-                    if m[pos] == '':
+                        if m[pos] == '':
+                            pos -= 1
+                    tm_arrows = time.time()
+            elif keyboard.is_pressed('Down'):
+                if time.time() - tm_arrows > SW_LATENCY:
+                    if pos < len(m) - 1:
                         pos += 1
-                tm_arrows = time.time()
-        elif keyboard.is_pressed('Enter'):
-            if time.time() - tm_enter > SW_LATENCY * 3:
-                if m == mainMenu:    # main menu do <jd>
-                    tm_enter = time.time()
-                    if pos == 0:
-                        return gen_password()
-                    elif pos == 1:
-                        return menu(showSaved)
-                    elif pos == 2:
-                        return menu(settingsMenu)
-                    elif pos == 3:
-                        return menu(aboutMenu)
-                    elif pos == 5:
-                        clear_console()
-                        flush_input()
-                        sys.exit()
-                elif m == settingsMenu:    # settings menu do <jd>
-                    tm_enter = time.time()
-                    if pos == 0:
-                        if debug_mode:
-                            debug_mode = False
-                            settingsMenu[0] = 'Debug mode: off'
-                        else:
-                            debug_mode = True
-                            settingsMenu[0] = 'Debug mode: on'
-                        print_list()
-                    elif pos == 1:
-                        return decryption_key_reset()
-                    elif pos == 3:
-                        return menu(mainMenu)
-                elif m == showSaved:    # showsaved menu do <jd>
-                    tm_enter = time.time()
-                    if pos == 0:
-                        if not delet:
-                            m[0] = 'Add my own password'
-                            trying_to_del = 0
-                            return add_pass()
-                        else:
-                            m[0] = 'NAH. YOU ARE STAYING HERE TILL U WON\'T DELETE THIS PASSWORD'
-                            print_list()
-                    elif pos == 1:
-                        if not scan_passwords():
-                            if not tried_to_del:    # ignore this code
-                                if trying_to_del < 2:
-                                    m[1] = 'There are no saved passwords!'
-                                elif 1 < trying_to_del < 4:
-                                    m[1] = 'There are still no saved passwords.'
-                                elif trying_to_del == 5:
-                                    m[1] = 'There are no passwords to delete.'
-                                elif trying_to_del == 6:
-                                    m[1] = 'Please stop doing it.'
-                                elif trying_to_del == 7:
-                                    m[1] = 'Seriosly, stop.'
-                                elif trying_to_del == 8:
-                                    m[1] = 'Thats not funny at all, stop.'
-                                elif trying_to_del == 9:
-                                    m[1] = 'JUST. STOP.'
-                                elif trying_to_del == 10:
-                                    m[1] = 'THERE. IS. NOTHING. TO. DELETE.'
-                                elif trying_to_del == 11:
-                                    m[1] = 'YOU WANT TO DELETE SOMETHING? OK, FINE'
-                                    print_list()
-                                    time.sleep(1)
-                                    m[1] = 'THERE! THERE\'S A PASSWORD FOR YOU!'
-                                    with open(FILENAME, 'w') as file:
-                                        file.write(str(fernet.encrypt('5CR3W_U_1D!0t'.encode())) + '\n')
-                                    print_list()
-                                    delet = True    # ignore this code
+                        if m[pos] == '':
+                            pos += 1
+                    tm_arrows = time.time()
+            elif keyboard.is_pressed('Enter'):
+                if time.time() - tm_enter > SW_LATENCY * 3:
+                    if m == mainMenu:    # main menu do <jd>
+                        tm_enter = time.time()
+                        if pos == 0:
+                            return gen_password()
+                        elif pos == 1:
+                            return menu(showSaved)
+                        elif pos == 2:
+                            return menu(settingsMenu)
+                        elif pos == 3:
+                            return menu(aboutMenu)
+                        elif pos == 5:
+                            clear_console()
+                            flush_input()
+                            sys.exit()
+                    elif m == settingsMenu:    # settings menu do <jd>
+                        tm_enter = time.time()
+                        if pos == 0:
+                            if debug_mode:
+                                debug_mode = False
+                                settingsMenu[0] = 'Debug mode: off'
                             else:
-                                m[1] = 'There are no passwords to delete.'
+                                debug_mode = True
+                                settingsMenu[0] = 'Debug mode: on'
                             print_list()
+                        elif pos == 1:
+                            return decryption_key_reset()
+                        elif pos == 3:
+                            return menu(mainMenu)
+                    elif m == showSaved:    # showsaved menu do <jd>
+                        tm_enter = time.time()
+                        if pos == 0:
                             if not delet:
-                                trying_to_del += 1
-                                time.sleep(1)
-                                m[1] = 'Delete all saved passwords'
+                                m[0] = 'Add my own password'
+                                trying_to_del = 0
+                                return add_pass()
+                            else:
+                                m[0] = 'NAH. YOU ARE STAYING HERE TILL U WON\'T DELETE THIS PASSWORD'
                                 print_list()
-                        else:
-                            trying_to_del = 0
-                            return wipe_pass()
-                    elif pos == 2:
-                        if not delet:
-                            m[2] = 'Exit to main menu'
-                            trying_to_del = 0
+                        elif pos == 1:
+                            if not scan_passwords():
+                                if not tried_to_del:    # ignore this code
+                                    if trying_to_del < 2:
+                                        m[1] = 'There are no saved passwords!'
+                                    elif 1 < trying_to_del < 4:
+                                        m[1] = 'There are still no saved passwords.'
+                                    elif trying_to_del == 5:
+                                        m[1] = 'There are no passwords to delete.'
+                                    elif trying_to_del == 6:
+                                        m[1] = 'Please stop doing it.'
+                                    elif trying_to_del == 7:
+                                        m[1] = 'Seriosly, stop.'
+                                    elif trying_to_del == 8:
+                                        m[1] = 'Thats not funny at all, stop.'
+                                    elif trying_to_del == 9:
+                                        m[1] = 'JUST. STOP.'
+                                    elif trying_to_del == 10:
+                                        m[1] = 'THERE. IS. NOTHING. TO. DELETE.'
+                                    elif trying_to_del == 11:
+                                        m[1] = 'YOU WANT TO DELETE SOMETHING? OK, FINE'
+                                        print_list()
+                                        time.sleep(1)
+                                        m[1] = 'THERE! THERE\'S A PASSWORD FOR YOU!'
+                                        with open(FILENAME, 'w') as file:
+                                            file.write(str(fernet.encrypt('5CR3W_U_1D!0t'.encode())) + '\n')
+                                        print_list()
+                                        delet = True    # ignore this code
+                                else:
+                                    m[1] = 'There are no passwords to delete.'
+                                print_list()
+                                if not delet:
+                                    trying_to_del += 1
+                                    time.sleep(1)
+                                    m[1] = 'Delete all saved passwords'
+                                    print_list()
+                            else:
+                                trying_to_del = 0
+                                return wipe_pass()
+                        elif pos == 2:
+                            if not delet:
+                                m[2] = 'Exit to main menu'
+                                trying_to_del = 0
+                                return menu(mainMenu)
+                            else:
+                                m[2] = 'NAH. YOU ARE STAYING HERE TILL U WON\'T DELETE THIS PASSWORD'    # IGNORE
+                                print_list()
+                    elif m == passSettingsMenu:   # generator settings menu do <jd>
+                        tm_enter = time.time()    # actual piece of shit
+                        if pos == 0:
+                            if 'l' not in pass_settings:
+                                passSettingsMenu[0] = '+ ' + passSettingsMenu[0]
+                                passSettingsMenu.insert(1, ' Use capital letters (A-Z)')
+                                pass_settings.append('l')
+                            else:
+                                passSettingsMenu[0] = passSettingsMenu[0].split('+ ')[1]
+                                if ' Use capital letters (A-Z)' in passSettingsMenu or ' + Use capital letters (A-Z)':
+                                    del passSettingsMenu[1]
+                                pass_settings.remove('l')
+                                if '^' in pass_settings:
+                                    pass_settings.remove('^')
+                        elif pos == 1:
+                            if 'l' in pass_settings:
+                                if '^' not in pass_settings:
+                                    passSettingsMenu[1] = ' +' + passSettingsMenu[1]
+                                    pass_settings.append('^')
+                                else:
+                                    passSettingsMenu[1] = passSettingsMenu[1].split(' +')[1]
+                                    pass_settings.remove('^')
+                            else:
+                                if 'n' not in pass_settings:
+                                    passSettingsMenu[1] = '+ ' + passSettingsMenu[1]
+                                    pass_settings.append('n')
+                                else:
+                                    passSettingsMenu[1] = passSettingsMenu[1].split('+ ')[1]
+                                    pass_settings.remove('n')
+                        elif pos == 2:
+                            if 'l' in pass_settings:
+                                if 'n' not in pass_settings:
+                                    passSettingsMenu[2] = '+ ' + passSettingsMenu[2]
+                                    pass_settings.append('n')
+                                else:
+                                    passSettingsMenu[2] = passSettingsMenu[2].split('+ ')[1]
+                                    pass_settings.remove('n')
+                            else:
+                                if 's' not in pass_settings:
+                                    passSettingsMenu[2] = '+ ' + passSettingsMenu[2]
+                                    pass_settings.append('s')
+                                else:
+                                    passSettingsMenu[2] = passSettingsMenu[2].split('+ ')[1]
+                                    pass_settings.remove('s')
+                        elif pos == 3:
+                            if 'l' in pass_settings:
+                                if 's' not in pass_settings:
+                                    passSettingsMenu[3] = '+ ' + passSettingsMenu[3]
+                                    pass_settings.append('s')
+                                else:
+                                    passSettingsMenu[3] = passSettingsMenu[3].split('+ ')[1]
+                                    pass_settings.remove('s')
+                            else:
+                                if pass_settings:
+                                    return pass_settings
+                                else:
+                                    absolute_error = 'You must select any setting.'
+                        elif pos == 4:
+                            if 'l' in pass_settings:
+                                if pass_settings:
+                                    return pass_settings
+                                else:
+                                    absolute_error = 'You must select any setting.'
+                        print_list()
+                    elif m == passwordMenu:    # generated password menu do <jd>
+                        tm_enter = time.time()
+                        if pos == 0:
+                            if not saved:
+                                saved = True
+                                with open(FILENAME, 'a') as add_pass_file:
+                                    add_pass_file.write(str(fernet.encrypt(password.encode())) + '\n')
+                                print_list()
+                            else:
+                                time.sleep(SW_LATENCY * 3)
+                                return gen_password()
+                        elif pos == 1:
+                            if not saved:
+                                time.sleep(SW_LATENCY * 3)
+                                return gen_password()
+                            else:
+                                return menu(mainMenu)
+                        elif pos == 2:
+                            if not saved:
+                                return menu(mainMenu)
+                    elif m == aboutMenu:    # about section do <jd>
+                        tm_enter = time.time()
+                        if pos == 0:
                             return menu(mainMenu)
-                        else:
-                            m[2] = 'NAH. YOU ARE STAYING HERE TILL U WON\'T DELETE THIS PASSWORD'    # IGNORE
-                            print_list()
-                elif m == passSettingsMenu:   # generator settings menu do <jd>
-                    tm_enter = time.time()    # actual piece of shit
-                    if pos == 0:
-                        if 'l' not in pass_settings:
-                            passSettingsMenu[0] = '+ ' + passSettingsMenu[0]
-                            passSettingsMenu.insert(1, ' Use capital letters (A-Z)')
-                            pass_settings.append('l')
-                        else:
-                            passSettingsMenu[0] = passSettingsMenu[0].split('+ ')[1]
-                            if ' Use capital letters (A-Z)' in passSettingsMenu or ' + Use capital letters (A-Z)':
-                                del passSettingsMenu[1]
-                            pass_settings.remove('l')
-                            if '^' in pass_settings:
-                                pass_settings.remove('^')
-                    elif pos == 1:
-                        if 'l' in pass_settings:
-                            if '^' not in pass_settings:
-                                passSettingsMenu[1] = ' +' + passSettingsMenu[1]
-                                pass_settings.append('^')
-                            else:
-                                passSettingsMenu[1] = passSettingsMenu[1].split(' +')[1]
-                                pass_settings.remove('^')
-                        else:
-                            if 'n' not in pass_settings:
-                                passSettingsMenu[1] = '+ ' + passSettingsMenu[1]
-                                pass_settings.append('n')
-                            else:
-                                passSettingsMenu[1] = passSettingsMenu[1].split('+ ')[1]
-                                pass_settings.remove('n')
-                    elif pos == 2:
-                        if 'l' in pass_settings:
-                            if 'n' not in pass_settings:
-                                passSettingsMenu[2] = '+ ' + passSettingsMenu[2]
-                                pass_settings.append('n')
-                            else:
-                                passSettingsMenu[2] = passSettingsMenu[2].split('+ ')[1]
-                                pass_settings.remove('n')
-                        else:
-                            if 's' not in pass_settings:
-                                passSettingsMenu[2] = '+ ' + passSettingsMenu[2]
-                                pass_settings.append('s')
-                            else:
-                                passSettingsMenu[2] = passSettingsMenu[2].split('+ ')[1]
-                                pass_settings.remove('s')
-                    elif pos == 3:
-                        if 'l' in pass_settings:
-                            if 's' not in pass_settings:
-                                passSettingsMenu[3] = '+ ' + passSettingsMenu[3]
-                                pass_settings.append('s')
-                            else:
-                                passSettingsMenu[3] = passSettingsMenu[3].split('+ ')[1]
-                                pass_settings.remove('s')
-                        else:
-                            if pass_settings:
-                                return pass_settings
-                            else:
-                                absolute_error = 'You must select any setting.'
-                    elif pos == 4:
-                        if 'l' in pass_settings:
-                            if pass_settings:
-                                return pass_settings
-                            else:
-                                absolute_error = 'You must select any setting.'
-                    print_list()
-                elif m == passwordMenu:    # generated password menu do <jd>
-                    tm_enter = time.time()
-                    if pos == 0:
-                        if not saved:
-                            saved = True
-                            with open(FILENAME, 'a') as add_pass_file:
-                                add_pass_file.write(str(fernet.encrypt(password.encode())) + '\n')
-                            print_list()
-                        else:
-                            time.sleep(SW_LATENCY * 3)
-                            return gen_password()
-                    elif pos == 1:
-                        if not saved:
-                            time.sleep(SW_LATENCY * 3)
-                            return gen_password()
-                        else:
-                            return menu(mainMenu)
-                    elif pos == 2:
-                        if not saved:
-                            return menu(mainMenu)
-                elif m == aboutMenu:    # about section do <jd>
-                    tm_enter = time.time()
-                    if pos == 0:
-                        return menu(mainMenu)
 
 
 def gen_password():    # generating password <jd>
@@ -651,7 +658,7 @@ def add_pass():    # adding your own password <jd>
 
 def wipe_pass():    # wiping passlist <jd>
     global delet, tried_to_del, showSaved
-    clear_console()    # TODO: create a menu where you can delete not only all saved passwords
+    clear_console()    # TODO: create a menu where you can select what passwords you want to delete
     flush_input()
     print('All these passwords will be deleted:')
     with open(FILENAME, 'r') as saved_pass_file:
