@@ -6,6 +6,7 @@ import time
 import keyboard
 import string
 import random
+import secrets
 import winreg
 from cryptography.fernet import Fernet
 
@@ -301,10 +302,9 @@ def about_section():
              'Discord: SyberiaK.#0396',
              'Twitter: @syberiakey',
              '',
-             'Version: 0.4.0 beta',
+             'Version: 0.3.2 beta',
              'What\'s new:',
-             '- Fixed an issue when pGen takes inputs while being non-focused',
-             '- Also fixed a header']
+             '- Swapped to "secrets" module for generating passwords']
     for o in about:
         print(o)
     print()
@@ -571,6 +571,7 @@ def menu(m: list):    # this little fella do all the hard work <jd>
 def gen_password():    # generating password <jd>
     global password, saved, tm_enter, gen_error
     using = ''
+    rnd = secrets.SystemRandom()
 
     saved = False
 
@@ -612,7 +613,7 @@ def gen_password():    # generating password <jd>
         using += string.digits
     if 's' in _settings:
         using += string.punctuation
-    password = ''.join(random.choice(using) for _ in range(int(length)))    # pass generator in one string <jd>
+    password = ''.join(rnd.choice(using) for _ in range(int(length)))    # pass generator in one string <jd>
     return menu(passwordMenu)
 
 
