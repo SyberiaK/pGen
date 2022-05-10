@@ -1,6 +1,8 @@
 # pGen - simply manage your passwords
 pGen is a simple open-source (but code is just a mess) user-friendly password generator that also can keep your passwords safe and sound
 
+![demo](https://i.imgur.com/jOnOw1V.gif)
+
 # Features
 - a password generator that can use wanted length of password or specific characters (for example: only letters or letters + numbers or other symbols + numbers)
 - you can always save the password you liked
