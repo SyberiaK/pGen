@@ -206,11 +206,11 @@ headlines = [    # headlines start <jd>
         '###         ########  ########## ###    ####      '
     ],
     [
-        '      8""""8           '
-        'eeeee 8    " eeee eeeee'
-        '8   8 8e     8    8   8'
-        '8eee8 88  ee 8eee 8e  8'
-        '88    88   8 88   88  8'
+        '      8""""8           ',
+        'eeeee 8    " eeee eeeee',
+        '8   8 8e     8    8   8',
+        '8eee8 88  ee 8eee 8e  8',
+        '88    88   8 88   88  8',
         '88    88eee8 88ee 88  8'
     ],
     [
